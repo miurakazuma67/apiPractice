@@ -5,17 +5,20 @@
 //  Created by 三浦　一真 on 2021/03/29.
 //
 
+import Foundation
 import UIKit
+
+struct Connpass: Codable {
+    var events: [Event]?
+    struct Event: Codable {
+        var title: String?
+    }
+}
 
 class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     @IBOutlet weak var tableView: UITableView!
     
-    var titles: [Connpass] = []
-    var eventTitle: String = "" {
-        didSet{
-            tableView.reloadData()
-        }
-    }
+    var connpass: Connpass?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,12 +34,10 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         let task: URLSessionTask = URLSession.shared.dataTask(with: url, completionHandler: {data, response, error in
             do {
                 let connpass = try JSONDecoder().decode(Connpass.self, from: data!)
-                self.titles = [connpass]
+                self.connpass = connpass
                 DispatchQueue.main.async() { () -> Void in
                     self.tableView.reloadData()
-                    
                 }
-                print(connpass)
             }
             catch {
                 print(error)
@@ -46,15 +47,15 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return titles.count
+        return 10
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") as! TableViewCell
-        cell.label?.text = "a"
+        cell.label?.text = connpass?.events?[indexPath.row].title
         return cell
     }
- 
+    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 80
     }
