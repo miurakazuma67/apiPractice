@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-struct Connpass: Codable {
+struct EventSearchResponse: Codable {
     var events: [Event]?
     struct Event: Codable {
         var title: String?
@@ -18,7 +18,7 @@ struct Connpass: Codable {
 class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     @IBOutlet weak var tableView: UITableView!
     
-    var connpass: Connpass?
+    var eventSearchResponse: EventSearchResponse?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,14 +27,15 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         tableView.dataSource = self
         let nib = UINib(nibName: "TableViewCell", bundle: nil)
         tableView.register(nib, forCellReuseIdentifier: "Cell")
+        navigationItem.title = "Swiftイベント一覧"
     }
     
     private func getApi() {
         guard let url: URL = URL(string: "https://connpass.com/api/v1/event/?keyword=Swift") else {return}
         let task: URLSessionTask = URLSession.shared.dataTask(with: url, completionHandler: {data, response, error in
             do {
-                let connpass = try JSONDecoder().decode(Connpass.self, from: data!)
-                self.connpass = connpass
+                let eventSearchResponse = try JSONDecoder().decode(EventSearchResponse.self, from: data!)
+                self.eventSearchResponse = eventSearchResponse
                 DispatchQueue.main.async() { () -> Void in
                     self.tableView.reloadData()
                 }
@@ -52,7 +53,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") as! TableViewCell
-        cell.label?.text = connpass?.events?[indexPath.row].title
+        cell.label?.text = eventSearchResponse?.events?[indexPath.row].title
         return cell
     }
     
