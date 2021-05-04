@@ -8,13 +8,6 @@
 import Foundation
 import UIKit
 
-struct EventSearchResponse: Codable {
-    var events: [Event]?
-    struct Event: Codable {
-        var title: String?
-    }
-}
-
 class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     @IBOutlet weak var tableView: UITableView!
     
@@ -33,11 +26,14 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     private func getApi() {
         guard let url: URL = URL(string: "https://connpass.com/api/v1/event/?keyword=Swift") else {return}
         let task: URLSessionTask = URLSession.shared.dataTask(with: url, completionHandler: {data, response, error in
+           
             do {
                 let eventSearchResponse = try JSONDecoder().decode(EventSearchResponse.self, from: data!)
                 self.eventSearchResponse = eventSearchResponse
+                
                 DispatchQueue.main.async() { () -> Void in
                     self.tableView.reloadData()
+                    print(eventSearchResponse)
                 }
             }
             catch {
@@ -48,7 +44,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 10
+        return eventSearchResponse?.events?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
