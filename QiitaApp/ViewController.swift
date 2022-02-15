@@ -8,8 +8,8 @@
 import Foundation
 import UIKit
 
-class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
-    @IBOutlet weak var tableView: UITableView!
+final class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+    @IBOutlet private weak var tableView: UITableView!
     
     var eventSearchResponse: EventSearchResponse?
     
